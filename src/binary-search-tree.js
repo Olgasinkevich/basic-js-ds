@@ -1,101 +1,115 @@
-const {NotImplementedError} = require('../extensions/index.js');
-
-// const { Node } = require('../extensions/list-tree.js');
-
-/**
- * Implement simple binary search tree according to task description
- * using Node from extensions
- */
-class Node {
-  constructor(data) {
-    this.data = data;
-    this.left = null;
-    this.right = null;
-  }
-}
+const { Node } = require('../extensions/list-tree.js');
 
 module.exports = class BinarySearchTree {
-  constructor() {
-    /*  this.tree = [];*/
-    this.root = null;
-  }
+    constructor() {
+         this.roots = null;
+    }
 
-  root() {
-    return this.root;
-  }
-
-  _addNode(node, data) {
-    if (!node) {
-      return new Node(data);
-    }
-    if (node.data === data) {
-      return node;
-    }
-    if (data < node.data) {
-      node.left = _addnode(node.left, data)
-    } else {
-      node.right = _addNode(node.right, data);
-    }
-    return node;
-  }
+    root() {
+     return this.roots;
+   }
 
   add(data) {
-    this.root = this._addNode(this.root, data);
-  }
+    this.roots = addNode(this.roots, data);
 
-  _searchNode(node, data) {
-    if (!node) {
-      return false;
+    function addNode(node, data) {
+      if (!node) {
+        return new Node(data);
+      }
+      if (node.data === data) {
+        return node;
+      }
+      if (data < node.data) {
+        node.left = addNode(node.left, data)
+      } else {
+        node.right = addNode(node.right, data);
+      }
+      return node;
     }
-    if (node.data === data) {
-      return true;
+  }
+
+    has(data) {
+    return searchNode(this.roots, data);
+    function searchNode(node, data) {
+      if (!node) {
+        return false;
+      }
+      if (node.data === data) {
+        return true;
+      }
+      return data < node.data ?
+         searchNode(node.left, data) :
+          searchNode(node.right, data);
     }
-    return data < node.data ?
-        this._searchNode(node.left, data) :
-        this._searchNode(node.right, data);
   }
 
-  has(data) {
-    return this._searchNode(this.root, data);
+   find(data) {
+    return findNode(this.roots, data);
 
-  }
-
-  _findNode(node, data) {
-    if (!node || !node.data === data) {
-      return null;
+    function findNode(node, data) {
+      if (!node) {
+        return null;
+      }
+      if (node.data === data) {
+        return node
+      }
+      return findNode(data < node.data ? node.left : node.right, data);
     }
-    return node;
   }
 
-  find(data) {
-    return this._findNode(this.root, data);
-
-  }
-
-  remove(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  remove(data) {
+    this.roots = removeNode (this.roots, data);
+    function removeNode (node, data) {
+      if (!node) {
+        return null;
+      }
+      if (data < node.data) {
+        node.left = removeNode(node.left, data);
+        return node;
+      } else if (node.data< data) {
+        node.right = removeNode (node.right, data);
+        return node;
+      }else {
+        if(!node.left && !node.right) {
+          return null;
+        }
+        if (!node.left) {
+          node = node.right;
+          return node;
+        }
+        if (!node.right) {
+          node = node.left;
+          return node;
+        }
+        let minFromRight = node.right;
+        while (minFromRight.left) {
+          minFromRight = minFromRight.left;
+        }
+        node.data = minFromRight.data;
+        node.right = removeNode (node.right, minFromRight.data);
+        return node;
+      }
+    }
   }
 
   min() {
-    if (!this.root) {
+    if (!this.roots) {
       return null;
     }
-    let min = this.root;
+    let node = this.roots;
     while (node.left) {
-      min = node.left;
-
-      return node.data;
+      node = node.left;
     }
+    return node.data;
   }
 
   max() {
-    if (!this.root) {
+    if (!this.roots) {
       return null;
     }
-    let max = this.root;
+    let node = this.roots;
     while (node.right) {
-      max = node.right;
+      node = node.right;
     }
     return node.data;
   }
